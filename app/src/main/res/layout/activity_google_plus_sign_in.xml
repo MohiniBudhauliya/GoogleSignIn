@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/backimg01"
+    tools:context="mb.com.googlesignin.GooglePlusSignIn">
+
+    <TextView
+        android:id="@+id/login_status"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Status"
+        android:textSize="20dp"
+        android:textColor="#009e73"
+        android:textAlignment="center"
+        android:layout_marginTop="30dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:textStyle="bold"/>
+
+    <ImageView
+        android:id="@+id/ProfilePic"
+        android:layout_width="90dp"
+        android:layout_height="90dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="80dp" />
+    <TextView
+        android:id="@+id/UserName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="80dp"
+        android:layout_marginLeft="60pt"
+        android:textStyle="bold"
+        android:textColor="#009e73"/>
+    <TextView
+        android:id="@+id/UserEmail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="130dp"
+        android:layout_marginLeft="60pt"
+        android:textStyle="bold"
+        android:textColor="#009e73"/>
+    <Button
+        android:id="@+id/fb_signinbutton"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="Sign In With fb"
+        android:drawableLeft="@drawable/fbbtn3"
+        android:layout_marginTop="410dp"
+        android:layout_marginBottom="50dp"
+        android:layout_marginRight="28dp"
+        android:layout_marginLeft="28dp"
+        android:backgroundTint="@color/colorPrimaryDark"/>
+    <Button
+        android:id="@+id/fb_signoutbutton"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="Sign Out With fb"
+        android:drawableLeft="@drawable/fbbtn3"
+        android:layout_marginBottom="49dp"
+        android:layout_marginTop="410dp"
+        android:layout_marginRight="28dp"
+        android:layout_marginLeft="28dp"
+        android:visibility="gone"
+        android:backgroundTint="@color/colorPrimaryDark"/>
+    <Button
+        android:id="@+id/gmail_signinbutton"
+        android:layout_width="match_parent"
+        android:layout_height="38dp"
+        android:text="Sign In With Google+"
+        android:drawableLeft="@drawable/gplusicon"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:layout_marginTop="340dp"
+        android:background="@android:color/holo_red_dark"/>
+    <TextView
+        android:id="@+id/OptionText"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="------------------------OR-------------------------"
+        android:textStyle="bold"
+        android:textColor="#009e73"
+        android:layout_marginRight="30dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginTop="392dp"/>
+
+    <Button
+        android:id="@+id/gmail_signoutbutton"
+        android:layout_width="match_parent"
+        android:layout_height="38dp"
+        android:layout_marginTop="340dp"
+        android:text="Sign Out With Google+"
+        android:drawableLeft="@drawable/gplusicon"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:layout_marginBottom="50dp"
+        android:background="@android:color/holo_red_dark"
+        android:visibility="gone"/>
+
+
+</RelativeLayout>
