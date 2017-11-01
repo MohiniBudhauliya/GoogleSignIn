@@ -122,30 +122,6 @@ public class GooglePlusSignIn extends AppCompatActivity implements View.OnClickL
                     }
                 });
 
-        fb_signinButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                SharedPreferences pref = getSharedPreferences("promo", MODE_PRIVATE);
-                boolean activated = pref.getBoolean("activated", false);
-                if (activated == false) {  // User hasn't actived the promocode -> activate it
-                    SharedPreferences.Editor editor = pref.edit();
-                    editor.putBoolean("activated", true);
-                    editor.commit();
-                    //LoginManager.getInstance().logInWithReadPermissions(GooglePlusSignIn.this, Arrays.asList("public_profile", "user_friends"));
-                }
-                else {
-                    //LoginManager.getInstance().logOut();
-                    LoginStatus.setText("Status");
-                    UserPic.setVisibility(View.GONE);
-                    SharedPreferences.Editor editor = pref.edit();
-                    editor.putBoolean("activated", false);
-                    editor.commit();
-
-                }
-            }
-
-
-        });
     }
     private void signIn() {
         Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
@@ -182,20 +158,28 @@ public class GooglePlusSignIn extends AppCompatActivity implements View.OnClickL
 
             String personName = acct.getDisplayName();
             String email = acct.getEmail();
-            String Pic = acct.getPhotoUrl().toString();
+            String Pic="";
+
+            UserName.setText(personName);
+            Email.setText(email);
+            if(acct.getPhotoUrl()==null)
+            {
+               UserPic.setImageResource(R.drawable.defaultpic);
+            }
+            else {
+                Pic= acct.getPhotoUrl().toString();
+                Glide.with(getApplicationContext()).load(Pic)
+                        .thumbnail(0.5f)
+                        .crossFade()
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .into(UserPic);
+                Toast.makeText(this, "You have successfully logged in", Toast.LENGTH_SHORT).show();
+            }
+            updateUI(true);
 
             Log.e(TAG, "Name: " + personName + ", email: " + email
                     + ", Image: " + Pic);
 
-            UserName.setText(personName);
-            Email.setText(email);
-            Glide.with(getApplicationContext()).load(Pic)
-                    .thumbnail(0.5f)
-                    .crossFade()
-                    .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .into(UserPic);
-            Toast.makeText(this, "You have successfully logged in", Toast.LENGTH_SHORT).show();
-            updateUI(true);
         }
         else
             {
@@ -215,7 +199,8 @@ public class GooglePlusSignIn extends AppCompatActivity implements View.OnClickL
             UserPic.setVisibility(View.VISIBLE);
             fb_signinButton.setVisibility(View.GONE);
             OptionText.setVisibility(View.GONE);
-        } else {
+        }
+        else {
             GmailSignOutButton.setVisibility(View.GONE);
             GmailSignInButton.setVisibility(View.VISIBLE);
             LoginStatus.setVisibility(View.VISIBLE);
@@ -252,13 +237,17 @@ public class GooglePlusSignIn extends AppCompatActivity implements View.OnClickL
                             UserName.setText(name);
                             Email.setText(email);
                             UserPic.setVisibility(View.VISIBLE);
+                            UserName.setVisibility(View.VISIBLE);
+                            Email.setVisibility(View.VISIBLE);
+                            LoginStatus.setVisibility(View.VISIBLE);
                             Log.i("Link", link);
                             if (Profile.getCurrentProfile() != null) {
-                                Glide.with(getApplicationContext()).load(Profile.getCurrentProfile().getProfilePictureUri(200, 200))
-                                        .thumbnail(0.5f)
-                                        .crossFade()
-                                        .diskCacheStrategy(DiskCacheStrategy.ALL)
-                                        .into(UserPic);
+
+                                    Glide.with(getApplicationContext()).load(Profile.getCurrentProfile().getProfilePictureUri(200, 200))
+                                            .thumbnail(0.5f)
+                                            .crossFade()
+                                            .diskCacheStrategy(DiskCacheStrategy.ALL)
+                                            .into(UserPic);
 
                             }
 
@@ -277,15 +266,17 @@ public class GooglePlusSignIn extends AppCompatActivity implements View.OnClickL
 
     private void fblouout()
     {
+        LoginManager.getInstance().logOut();
         GmailSignOutButton.setVisibility(View.GONE);
         GmailSignInButton.setVisibility(View.VISIBLE);
         fb_signinButton.setVisibility(View.VISIBLE);
         fb_signoutButton.setVisibility(View.GONE);
-        LoginStatus.setVisibility(View.GONE);
+        LoginStatus.setVisibility(View.VISIBLE);
         UserPic.setVisibility(View.GONE);
         Email.setVisibility(View.GONE);
         UserName.setVisibility(View.GONE);
         OptionText.setVisibility(View.VISIBLE);
+        LoginStatus.setText("Status");
 
     }
     @Override
