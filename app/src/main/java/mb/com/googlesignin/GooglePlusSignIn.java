@@ -46,7 +46,9 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.DateFormat;
 import java.util.Arrays;
+import java.util.Date;
 
 public class GooglePlusSignIn extends AppCompatActivity implements View.OnClickListener,
         GoogleApiClient.OnConnectionFailedListener {
@@ -60,7 +62,7 @@ public class GooglePlusSignIn extends AppCompatActivity implements View.OnClickL
     private TextView LoginStatus, Email, UserName, OptionText;
     private ImageView UserPic;
     CallbackManager callbackManager;
-
+    DatabaseHelper dbhelper=new DatabaseHelper(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -159,7 +161,7 @@ public class GooglePlusSignIn extends AppCompatActivity implements View.OnClickL
             String personName = acct.getDisplayName();
             String email = acct.getEmail();
             String Pic="";
-
+            String time= DateFormat.getDateTimeInstance().format(new Date());
             UserName.setText(personName);
             Email.setText(email);
             if(acct.getPhotoUrl()==null)
@@ -175,10 +177,12 @@ public class GooglePlusSignIn extends AppCompatActivity implements View.OnClickL
                         .into(UserPic);
                 Toast.makeText(this, "You have successfully logged in", Toast.LENGTH_SHORT).show();
             }
+            dbhelper.insertRecord(personName,email,"Google",time);
             updateUI(true);
 
             Log.e(TAG, "Name: " + personName + ", email: " + email
                     + ", Image: " + Pic);
+
 
         }
         else
