@@ -32,9 +32,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String COLUMN_User_Email="user_email";
     private static final String COLUMN_User_Password="user_password";
     private static final String COLUMN_Login_Time="login_time";
-
     private static final String COLUMN_App_Name="app_name";
-
+    int count=0;
 
 
 
@@ -56,7 +55,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     {
         db.execSQL(CREATE_USER_TABLE);
         this.db=db;
-        getWritableDatabase();
+       // getWritableDatabase();
     }
 
 
@@ -77,32 +76,39 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         content.put(COLUMN_App_Name,obj.getAppname());
         db.insert(Table_Name,null,content);
     }
-    int count=0;
+
+    public void delete()
+    {
+        String deleteQuery="delete from "+Table_Name;
+        db.execSQL(deleteQuery);
+    }
+
     public int isLoggedIn()
     {
         db=this.getReadableDatabase();
         String sql="SELECT COUNT(*) FROM " + Table_Name;
         int noOfRows =getReadableDatabase().rawQuery(sql,null).getCount();
-//        String query1="Select * from "+Table_Name;
-//        Cursor c1=getReadableDatabase().rawQuery(query1,null);
        String query="Select "+ COLUMN_App_Name+" from "+Table_Name;
        Cursor cursor=getReadableDatabase().rawQuery(query,null);
-
-        if(noOfRows>0)
+        if(cursor!=null&&cursor.moveToNext())
         {
-            String userloginwith=cursor.getString(cursor.getColumnIndex("app_name"));
-            if(userloginwith.equalsIgnoreCase("Google"))
+            String userloginwith = cursor.getString(cursor.getColumnIndex("app_name"));
+            if(cursor.getCount()>0)
             {
-                count=1;
+                if (userloginwith.equalsIgnoreCase("Google"))
+                {
+                    count = 1;
+                    return count;
 
+                }
+                else if (userloginwith.equalsIgnoreCase("Facebook"))
+                {
+                    count = 2;
+                    return count;
+                }
             }
-            else if(userloginwith.equalsIgnoreCase("Facebook"))
-            {
-                count=2;
-
-            }
-
         }
+
         return count;
     }
 

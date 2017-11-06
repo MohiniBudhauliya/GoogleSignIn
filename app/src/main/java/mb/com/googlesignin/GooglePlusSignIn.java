@@ -126,7 +126,7 @@ public class GooglePlusSignIn extends AppCompatActivity implements View.OnClickL
                             LoginStatus.setText("An Error Occured");
                         }
                     });
-         int checkLogin= dbhelper.isLoggedIn();
+        int checkLogin= dbhelper.isLoggedIn();
         if(checkLogin==1)
         {
             signIn();
@@ -135,6 +135,7 @@ public class GooglePlusSignIn extends AppCompatActivity implements View.OnClickL
         {
             LoginManager.getInstance().logInWithReadPermissions(GooglePlusSignIn.this,
                     Arrays.asList("public_profile","user_friends","email"));
+
         }
         }
 
@@ -154,6 +155,7 @@ public class GooglePlusSignIn extends AppCompatActivity implements View.OnClickL
                     }
                 });
         Toast.makeText(this, "You have successfully logged Out", Toast.LENGTH_SHORT).show();
+        dbhelper.delete();
     }
 
 
@@ -300,7 +302,9 @@ public class GooglePlusSignIn extends AppCompatActivity implements View.OnClickL
 
 
     public void fblouout() {
+
         LoginManager.getInstance().logOut();
+        dbhelper.delete();
         gmailSignOutButton.setVisibility(View.GONE);
         gmailSignInButton.setVisibility(View.VISIBLE);
         fb_signinButton.setVisibility(View.VISIBLE);
