@@ -7,33 +7,29 @@ package mb.com.googlesignin;
 public class LoginUserDetails {
     String name,email,logintime,app_name;
 
-    public String getName()
-    {
-        return this.name;
-    }
     public void setName(String name)
     {
         this.name=name;
     }
-    public String getEmail()
+    public String getName()
     {
-        return this.email;
+        return this.name;
     }
     public void setEmail(String email)
     {
         this.email=email;
     }
-    public String getLogintime()
+    public String getEmail()
     {
-        return this.logintime;
+        return this.email;
     }
     public void setLogintime(String logintime)
     {
         this.logintime=logintime;
     }
-    public String setLogintime()
+    public String getLogintime()
     {
-        return  this.logintime;
+        return this.logintime;
     }
     public void setAppname(String app_name)
     {
@@ -43,4 +39,6 @@ public class LoginUserDetails {
     {
         return  this.app_name;
     }
+
+
 }

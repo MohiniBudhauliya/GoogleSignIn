@@ -34,8 +34,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String COLUMN_Login_Time="login_time";
     private static final String COLUMN_App_Name="app_name";
     int count=0;
-
-
+    LoginUserDetails userloginwith=new LoginUserDetails();
+    String app;
 
     private String CREATE_USER_TABLE="CREATE TABLE "+ Table_Name +"("
             + COLUMN_User_Id +" INTEGER PRIMARY KEY AUTOINCREMENT," + COLUMN_User_Name +
@@ -55,7 +55,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     {
         db.execSQL(CREATE_USER_TABLE);
         this.db=db;
-       // getWritableDatabase();
+       //getWritableDatabase();
     }
 
 
@@ -83,33 +83,29 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(deleteQuery);
     }
 
-    public int isLoggedIn()
+
+    public LoginUserDetails isLoggedIn()
     {
-        db=this.getReadableDatabase();
-        String sql="SELECT COUNT(*) FROM " + Table_Name;
-        int noOfRows =getReadableDatabase().rawQuery(sql,null).getCount();
-       String query="Select "+ COLUMN_App_Name+" from "+Table_Name;
-       Cursor cursor=getReadableDatabase().rawQuery(query,null);
-        if(cursor!=null&&cursor.moveToNext())
+        db = this.getReadableDatabase();
+        String sql = "SELECT COUNT(*) FROM " + Table_Name;
+        int noOfRows = getReadableDatabase().rawQuery(sql, null).getCount();
+        String query = "Select " + COLUMN_App_Name + " from " + Table_Name;
+        Cursor cursor = getReadableDatabase().rawQuery(query, null);
+        int count=cursor.getCount();
+        if (cursor!=null)
         {
-            String userloginwith = cursor.getString(cursor.getColumnIndex("app_name"));
-            if(cursor.getCount()>0)
-            {
-                if (userloginwith.equalsIgnoreCase("Google"))
-                {
-                    count = 1;
-                    return count;
-
-                }
-                else if (userloginwith.equalsIgnoreCase("Facebook"))
-                {
-                    count = 2;
-                    return count;
-                }
+            if(count>0) {
+                cursor.moveToFirst();
+                app = cursor.getString(cursor.getColumnIndex("app_name"));
+                userloginwith.setAppname(app);
             }
-        }
+            else
+            {
+                userloginwith.setAppname("null");
+            }
+         }
 
-        return count;
+       return  userloginwith;
     }
 
 }

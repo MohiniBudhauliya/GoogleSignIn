@@ -12,7 +12,7 @@ import android.widget.Toast;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class userRegistration extends AppCompatActivity {
+public class UserRegistration extends AppCompatActivity {
 
     EditText UserName,UserEmail,Password,UserDOB;
     String UName,UEid,Pwd,DOB;

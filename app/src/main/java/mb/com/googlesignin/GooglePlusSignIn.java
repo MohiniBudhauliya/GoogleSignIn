@@ -1,8 +1,11 @@
 package mb.com.googlesignin;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -47,9 +50,13 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.net.HttpURLConnection;
+import java.net.InetAddress;
+import java.net.Socket;
 import java.text.DateFormat;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.concurrent.TimeoutException;
 
 public class GooglePlusSignIn extends AppCompatActivity implements View.OnClickListener,
         GoogleApiClient.OnConnectionFailedListener {
@@ -59,11 +66,12 @@ public class GooglePlusSignIn extends AppCompatActivity implements View.OnClickL
 
     public GoogleApiClient mGoogleApiClient;
     public Button gmailSignInButton, gmailSignOutButton, fb_signinButton, fb_signoutButton;
-    public TextView LoginStatus, Email, UserName, OptionText;
-    public ImageView UserPic;
+    public TextView loginStatus, userEmail, userName, optionText;
+    public ImageView userPic;
     CallbackManager callbackManager;
-    DatabaseHelper dbhelper=new DatabaseHelper(this);
-    LoginUserDetails userdetail=new LoginUserDetails();
+    DatabaseHelper dbhelper = new DatabaseHelper(this);
+    LoginUserDetails userdetail = new LoginUserDetails();
+    int checkLoginWith;
 
 
     @Override
@@ -72,78 +80,98 @@ public class GooglePlusSignIn extends AppCompatActivity implements View.OnClickL
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_google_plus_sign_in);
 
-            //Finding Controls by Id from corresponding XML file
-            gmailSignInButton = (Button) findViewById(R.id.gmail_signinbutton);
-            gmailSignOutButton = (Button) findViewById(R.id.gmail_signoutbutton);
-            LoginStatus = (TextView) findViewById(R.id.login_status);
-            UserName = (TextView) findViewById(R.id.UserName);
-            Email = (TextView) findViewById(R.id.UserEmail);
-            UserPic = (ImageView) findViewById(R.id.ProfilePic);
-            OptionText = (TextView) findViewById(R.id.OptionText);
-            fb_signinButton = (Button) findViewById(R.id.fb_signinbutton);
-            fb_signoutButton = (Button) findViewById(R.id.fb_signoutbutton);
+        //Finding Controls by Id from corresponding XML file
+        gmailSignInButton = (Button) findViewById(R.id.gmail_signinbutton);
+        gmailSignOutButton = (Button) findViewById(R.id.gmail_signoutbutton);
+        loginStatus = (TextView) findViewById(R.id.login_status);
+        userName = (TextView) findViewById(R.id.UserName);
+        userEmail = (TextView) findViewById(R.id.UserEmail);
+        userPic = (ImageView) findViewById(R.id.ProfilePic);
+        optionText = (TextView) findViewById(R.id.OptionText);
+        fb_signinButton = (Button) findViewById(R.id.fb_signinbutton);
+        fb_signoutButton = (Button) findViewById(R.id.fb_signoutbutton);
 
-            //Changing color of text on button
-            fb_signinButton.setTextColor(Color.parseColor("#c5f5f0"));
-            fb_signoutButton.setTextColor(Color.parseColor("#c5f5f0"));
-            gmailSignInButton.setTextColor(Color.parseColor("#c5f5f0"));
-            gmailSignOutButton.setTextColor(Color.parseColor("#c5f5f0"));
-
-
-            gmailSignInButton.setOnClickListener(this);
-            gmailSignOutButton.setOnClickListener(this);
-            fb_signinButton.setOnClickListener(this);
-            fb_signoutButton.setOnClickListener(this);
+        //Changing color of text on button
+        fb_signinButton.setTextColor(Color.parseColor("#c5f5f0"));
+        fb_signoutButton.setTextColor(Color.parseColor("#c5f5f0"));
+        gmailSignInButton.setTextColor(Color.parseColor("#c5f5f0"));
+        gmailSignOutButton.setTextColor(Color.parseColor("#c5f5f0"));
 
 
-            GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                    .requestEmail()
-                    .build();
-            // Build a GoogleApiClient with access to the Google Sign-In API and the
-            // options specified by gso.
-            mGoogleApiClient = new GoogleApiClient.Builder(this)
-                    .enableAutoManage(this, this)
-                    .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-                    .build();
+        gmailSignInButton.setOnClickListener(this);
+        gmailSignOutButton.setOnClickListener(this);
+        fb_signinButton.setOnClickListener(this);
+        fb_signoutButton.setOnClickListener(this);
 
 
-            callbackManager = CallbackManager.Factory.create();
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+        // Build a GoogleApiClient with access to the Google Sign-In API and the
+        // options specified by gso.
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .enableAutoManage(this, this)
+                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .build();
 
-            LoginManager.getInstance().registerCallback(callbackManager,
-                    new FacebookCallback<LoginResult>() {
-                        @Override
-                        public void onSuccess(LoginResult loginResult) {
-                            setFacebookData(loginResult);
-                        }
 
-                        @Override
-                        public void onCancel() {
-                            LoginStatus.setText("Login Cancelled");
-                        }
+        callbackManager = CallbackManager.Factory.create();
 
-                        @Override
-                        public void onError(FacebookException exception) {
-                            LoginStatus.setText("An Error Occured");
-                        }
-                    });
-        int checkLogin= dbhelper.isLoggedIn();
-        if(checkLogin==1)
-        {
+        LoginManager.getInstance().registerCallback(callbackManager,
+                new FacebookCallback<LoginResult>() {
+                    @Override
+                    public void onSuccess(LoginResult loginResult) {
+                        setFacebookData(loginResult);
+                    }
+
+                    @Override
+                    public void onCancel() {
+                        loginStatus.setText("Login Cancelled");
+                    }
+
+                    @Override
+                    public void onError(FacebookException exception) {
+                        loginStatus.setText("Check your internet connection please");
+                    }
+                });
+
+        userdetail = dbhelper.isLoggedIn();
+        if ((userdetail.getAppname()).equals("Google")) {
             signIn();
-        }
-        else if(checkLogin==2)
-        {
+        } else if ((userdetail.getAppname()).equals("Facebook")) {
             LoginManager.getInstance().logInWithReadPermissions(GooglePlusSignIn.this,
-                    Arrays.asList("public_profile","user_friends","email"));
+                    Arrays.asList("public_profile", "user_friends", "email"));
 
         }
-        }
-
-
-    public void signIn() {
-        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
-        startActivityForResult(signInIntent, RC_SIGN_IN);
     }
+
+
+    boolean connected = false;
+
+    public boolean check_InternnetConnection() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED ||
+                connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED) {
+            //we are connected to a network
+            connected = true;
+            return connected;
+        }
+        return connected;
+    }
+
+
+        public void signIn(){
+            check_InternnetConnection();
+                if(connected) {
+                    Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+                    startActivityForResult(signInIntent, RC_SIGN_IN);
+                }
+                else
+                {
+                    Toast.makeText(this,"Check your internet connection please",Toast.LENGTH_SHORT).show();
+                }
+
+                      }
 
     public void signOut() {
 
@@ -160,9 +188,8 @@ public class GooglePlusSignIn extends AppCompatActivity implements View.OnClickL
 
 
     @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        // An unresolvable error has occurred and Google APIs (including Sign-In) will not
-        // be available.
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+
         Log.d(TAG, "onConnectionFailed:" + connectionResult);
     }
 
@@ -184,19 +211,19 @@ public class GooglePlusSignIn extends AppCompatActivity implements View.OnClickL
                 String personName = acct.getDisplayName();
                 String email = acct.getEmail();
 
-                UserName.setText(personName);
-                Email.setText(email);
+                userName.setText(personName);
+                userEmail.setText(email);
 
                 String Pic = "";
                 if (acct.getPhotoUrl() == null) {
-                    UserPic.setImageResource(R.drawable.defaultpic);
+                    userPic.setImageResource(R.drawable.defaultpic);
                 } else {
                     Pic = acct.getPhotoUrl().toString();
                     Glide.with(getApplicationContext()).load(Pic)
                             .thumbnail(0.5f)
                             .crossFade()
                             .diskCacheStrategy(DiskCacheStrategy.ALL)
-                            .into(UserPic);
+                            .into(userPic);
                     Toast.makeText(this, "You have successfully logged in", Toast.LENGTH_SHORT).show();
                 }
                 dbhelper.insertRecord(userdetail);
@@ -219,23 +246,23 @@ public class GooglePlusSignIn extends AppCompatActivity implements View.OnClickL
 
         if (isSignedIn) {
             gmailSignInButton.setVisibility(View.GONE);
-            LoginStatus.setText("Status");
+            loginStatus.setText("Status");
             gmailSignOutButton.setVisibility(View.VISIBLE);
-            UserName.setVisibility(View.VISIBLE);
-            Email.setVisibility(View.VISIBLE);
-            UserPic.setVisibility(View.VISIBLE);
+            userName.setVisibility(View.VISIBLE);
+            userEmail.setVisibility(View.VISIBLE);
+            userPic.setVisibility(View.VISIBLE);
             fb_signinButton.setVisibility(View.GONE);
-            OptionText.setVisibility(View.GONE);
+            optionText.setVisibility(View.GONE);
         }
         else {
             gmailSignOutButton.setVisibility(View.GONE);
             gmailSignInButton.setVisibility(View.VISIBLE);
-            LoginStatus.setVisibility(View.VISIBLE);
-            UserName.setVisibility(View.GONE);
-            Email.setVisibility(View.GONE);
-            UserPic.setVisibility(View.GONE);
+            loginStatus.setVisibility(View.VISIBLE);
+            userName.setVisibility(View.GONE);
+            userEmail.setVisibility(View.GONE);
+            userPic.setVisibility(View.GONE);
             fb_signinButton.setVisibility(View.VISIBLE);
-            OptionText.setVisibility(View.VISIBLE);
+            optionText.setVisibility(View.VISIBLE);
         }
 
 
@@ -254,7 +281,7 @@ public class GooglePlusSignIn extends AppCompatActivity implements View.OnClickL
                             gmailSignOutButton.setVisibility(View.GONE);
                             gmailSignInButton.setVisibility(View.GONE);
                             fb_signinButton.setVisibility(View.GONE);
-                            OptionText.setVisibility(View.GONE);
+                            optionText.setVisibility(View.GONE);
                             fb_signoutButton.setVisibility(View.VISIBLE);
 
                             String email = response.getJSONObject().getString("email");
@@ -267,15 +294,15 @@ public class GooglePlusSignIn extends AppCompatActivity implements View.OnClickL
                             userdetail.setEmail(response.getJSONObject().getString("email"));
                             userdetail.setAppname("Facebook");
                             userdetail.setLogintime(DateFormat.getDateTimeInstance().format(new Date()));
-                            LoginStatus.setText("Login Success");
+                            loginStatus.setText("Login Success");
 
-                            UserName.setText(name);
-                            Email.setText(email);
-                            UserPic.setVisibility(View.VISIBLE);
-                            UserName.setVisibility(View.VISIBLE);
-                            Email.setVisibility(View.VISIBLE);
+                            userName.setText(name);
+                            userEmail.setText(email);
+                            userPic.setVisibility(View.VISIBLE);
+                            userName.setVisibility(View.VISIBLE);
+                            userEmail.setVisibility(View.VISIBLE);
 
-                            LoginStatus.setVisibility(View.VISIBLE);
+                            loginStatus.setVisibility(View.VISIBLE);
                             Log.i("Link", link);
                             if (Profile.getCurrentProfile() != null) {
 
@@ -283,7 +310,7 @@ public class GooglePlusSignIn extends AppCompatActivity implements View.OnClickL
                                         .thumbnail(0.5f)
                                         .crossFade()
                                         .diskCacheStrategy(DiskCacheStrategy.ALL)
-                                        .into(UserPic);
+                                        .into(userPic);
 
                             }
                             dbhelper.insertRecord(userdetail);
@@ -309,12 +336,12 @@ public class GooglePlusSignIn extends AppCompatActivity implements View.OnClickL
         gmailSignInButton.setVisibility(View.VISIBLE);
         fb_signinButton.setVisibility(View.VISIBLE);
         fb_signoutButton.setVisibility(View.GONE);
-        LoginStatus.setVisibility(View.VISIBLE);
-        UserPic.setVisibility(View.GONE);
-        Email.setVisibility(View.GONE);
-        UserName.setVisibility(View.GONE);
-        OptionText.setVisibility(View.VISIBLE);
-        LoginStatus.setText("Status");
+        loginStatus.setVisibility(View.VISIBLE);
+        userPic.setVisibility(View.GONE);
+        userEmail.setVisibility(View.GONE);
+        userName.setVisibility(View.GONE);
+        optionText.setVisibility(View.VISIBLE);
+        loginStatus.setText("Status");
 
     }
 
