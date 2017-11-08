@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/backimg"
     android:orientation="vertical"
-    tools:context="mb.com.googlesignin.GooglePlusSignIn">
+    tools:context="mb.com.googlesignin.MainActivity.GooglePlusSignIn">
 <LinearLayout
     android:id="@+id/linearLayout2"
     android:layout_width="match_parent"

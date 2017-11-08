@@ -1,4 +1,4 @@
-package mb.com.googlesignin;
+package mb.com.googlesignin.UserRelatedClasses;
 
 /**
  * Created by Anshul on 04-11-17.

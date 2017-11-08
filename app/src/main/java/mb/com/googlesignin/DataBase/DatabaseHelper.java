@@ -1,21 +1,12 @@
-package mb.com.googlesignin;
+package mb.com.googlesignin.DataBase;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.os.Environment;
-import android.os.UserHandle;
-import android.widget.Toast;
 
-import com.google.android.gms.auth.api.signin.GoogleSignInResult;
-import com.google.android.gms.auth.api.signin.GoogleSignInStatusCodes;
-
-import java.io.File;
-
-import static android.R.attr.password;
-import static com.facebook.FacebookSdk.getApplicationContext;
+import mb.com.googlesignin.UserRelatedClasses.LoginUserDetails;
 
 /**
  * Created by Anshul on 02-11-17.

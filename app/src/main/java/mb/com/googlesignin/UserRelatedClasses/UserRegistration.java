@@ -1,4 +1,4 @@
-package mb.com.googlesignin;
+package mb.com.googlesignin.UserRelatedClasses;
 import android.content.Context;
 import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
@@ -11,6 +11,8 @@ import android.widget.Toast;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import mb.com.googlesignin.R;
 
 public class UserRegistration extends AppCompatActivity {
 

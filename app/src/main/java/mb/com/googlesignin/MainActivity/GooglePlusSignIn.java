@@ -1,24 +1,21 @@
-package mb.com.googlesignin;
+package mb.com.googlesignin.MainActivity;
 
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
+import android.app.VoiceInteractor;
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
-import android.app.ProgressDialog;
 import android.content.Intent;
-import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.View;
+import android.widget.Adapter;
 import android.widget.Button;
+import android.widget.Gallery;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,25 +35,22 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.OptionalPendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 
 
-import com.google.android.gms.common.api.GoogleApiClient;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.net.HttpURLConnection;
-import java.net.InetAddress;
-import java.net.Socket;
 import java.text.DateFormat;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.concurrent.TimeoutException;
+
+import mb.com.googlesignin.DataBase.DatabaseHelper;
+import mb.com.googlesignin.FlieManager.FileManagerActivity;
+import mb.com.googlesignin.UserRelatedClasses.LoginUserDetails;
+import mb.com.googlesignin.R;
 
 public class GooglePlusSignIn extends AppCompatActivity implements View.OnClickListener,
         GoogleApiClient.OnConnectionFailedListener {
@@ -65,12 +59,13 @@ public class GooglePlusSignIn extends AppCompatActivity implements View.OnClickL
     private static final int RC_SIGN_IN = 007;
 
     public GoogleApiClient mGoogleApiClient;
-    public Button gmailSignInButton, gmailSignOutButton, fb_signinButton, fb_signoutButton;
+    public Button gmailSignInButton, gmailSignOutButton, fb_signinButton, fb_signoutButton,filemanagerbutton;
     public TextView loginStatus, userEmail, userName, optionText;
     public ImageView userPic;
     CallbackManager callbackManager;
     DatabaseHelper dbhelper = new DatabaseHelper(this);
     LoginUserDetails userdetail = new LoginUserDetails();
+    public final int PICK_MULTIPLE_IMAGE=4;
     int checkLoginWith;
 
 
@@ -79,6 +74,13 @@ public class GooglePlusSignIn extends AppCompatActivity implements View.OnClickL
         FacebookSdk.sdkInitialize(this.getApplicationContext());
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_google_plus_sign_in);
+
+
+        FileManagerActivity filemanager = new FileManagerActivity();
+        FragmentManager manager = getFragmentManager();
+        FragmentTransaction transaction = manager.beginTransaction();
+        transaction.add(R.id.mainXMlFile, filemanager, "GoToFile");
+        transaction.commit();
 
         //Finding Controls by Id from corresponding XML file
         gmailSignInButton = (Button) findViewById(R.id.gmail_signinbutton);
@@ -90,6 +92,7 @@ public class GooglePlusSignIn extends AppCompatActivity implements View.OnClickL
         optionText = (TextView) findViewById(R.id.OptionText);
         fb_signinButton = (Button) findViewById(R.id.fb_signinbutton);
         fb_signoutButton = (Button) findViewById(R.id.fb_signoutbutton);
+        filemanagerbutton=(Button)findViewById(R.id.filemangaerbutton);
 
         //Changing color of text on button
         fb_signinButton.setTextColor(Color.parseColor("#c5f5f0"));
@@ -102,6 +105,8 @@ public class GooglePlusSignIn extends AppCompatActivity implements View.OnClickL
         gmailSignOutButton.setOnClickListener(this);
         fb_signinButton.setOnClickListener(this);
         fb_signoutButton.setOnClickListener(this);
+        filemanagerbutton.setOnClickListener(this);
+
 
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -230,6 +235,7 @@ public class GooglePlusSignIn extends AppCompatActivity implements View.OnClickL
 
                 updateUI(true);
 
+
                 Log.e(TAG, "Name: " + personName + ", email: " + email
                         + ", Image: " + Pic);
 
@@ -239,6 +245,15 @@ public class GooglePlusSignIn extends AppCompatActivity implements View.OnClickL
                     updateUI(false);
                 }
             }
+
+    public void openFileManager() {
+        Intent intent1 = new Intent();//Intent.ACTION_OPEN_DOCUMENT
+        intent1.addCategory(Intent.CATEGORY_OPENABLE);
+        intent1.setType("image/*");
+        intent1.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+        intent1.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(intent1,"Select Picture"),PICK_MULTIPLE_IMAGE);
+    }
 
 
 
@@ -253,6 +268,8 @@ public class GooglePlusSignIn extends AppCompatActivity implements View.OnClickL
             userPic.setVisibility(View.VISIBLE);
             fb_signinButton.setVisibility(View.GONE);
             optionText.setVisibility(View.GONE);
+            filemanagerbutton.setVisibility(View.VISIBLE);
+
         }
         else {
             gmailSignOutButton.setVisibility(View.GONE);
@@ -378,7 +395,13 @@ public class GooglePlusSignIn extends AppCompatActivity implements View.OnClickL
                 case R.id.fb_signoutbutton:
                     fblouout();
                     break;
+                case R.id.filemangaerbutton:
+                    openFileManager();
+                    break;
+
             }
+
+
 
 
     }
