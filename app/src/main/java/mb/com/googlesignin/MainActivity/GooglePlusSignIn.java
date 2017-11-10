@@ -1,24 +1,19 @@
 package mb.com.googlesignin.MainActivity;
 
+import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.Uri;
-import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.content.Intent;
 import android.util.Log;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -46,19 +41,15 @@ import com.google.android.gms.common.api.Status;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.text.DateFormat;
 import java.util.Arrays;
 import java.util.Date;
 
 import mb.com.googlesignin.DataBase.DatabaseHelper;
-import mb.com.googlesignin.filemanager.FileManagerActivity;
+import mb.com.googlesignin.filemanager.ImageFragment;
 import mb.com.googlesignin.UserRelatedClasses.LoginUserDetails;
 import mb.com.googlesignin.R;
 
-import static android.R.attr.data;
 import static mb.com.googlesignin.R.id.ProfilePic;
 
 public class GooglePlusSignIn extends AppCompatActivity implements View.OnClickListener,
@@ -66,7 +57,6 @@ public class GooglePlusSignIn extends AppCompatActivity implements View.OnClickL
 
     private static final String TAG = GooglePlusSignIn.class.getSimpleName();
     private static final int RC_SIGN_IN = 007;
-
     public GoogleApiClient mGoogleApiClient;
     public Button gmailSignInButton, gmailSignOutButton, fb_signinButton, fb_signoutButton,filemanagerbutton;
     public TextView loginStatus, userEmail, userName, optionText;
@@ -74,8 +64,7 @@ public class GooglePlusSignIn extends AppCompatActivity implements View.OnClickL
     CallbackManager callbackManager;
     DatabaseHelper dbhelper = new DatabaseHelper(this);
     LoginUserDetails userdetail = new LoginUserDetails();
-    public final int PICK_MULTIPLE_IMAGE=4;
-    ImageView seeImage;
+
 
 
     @Override
@@ -84,13 +73,12 @@ public class GooglePlusSignIn extends AppCompatActivity implements View.OnClickL
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_google_plus_sign_in);
 
-
-        FileManagerActivity filemanager = new FileManagerActivity();
+        final ImageFragment imageFragment = new ImageFragment();
         FragmentManager manager = getFragmentManager();
         FragmentTransaction transaction = manager.beginTransaction();
-        transaction.add(R.id.mainXMlFile, filemanager, "GoToFile");
-        //transaction.replace(R.id.seeImage,filemanager);
+        transaction.add(R.id.mainXMlFile, imageFragment, "GoToFile");
         transaction.commit();
+
         //Finding Controls by Id from corresponding XML file
         gmailSignInButton = (Button) findViewById(R.id.gmail_signinbutton);
         gmailSignOutButton = (Button) findViewById(R.id.gmail_signoutbutton);
@@ -103,7 +91,8 @@ public class GooglePlusSignIn extends AppCompatActivity implements View.OnClickL
         fb_signoutButton = (Button) findViewById(R.id.fb_signoutbutton);
         filemanagerbutton=(Button)findViewById(R.id.filemangaerbutton);
 
-        seeImage=(ImageView)findViewById(R.id.seeImage);
+        //seeImage=(ImageView)findViewById(R.id.seeImage);
+
         //Changing color of text on button
         fb_signinButton.setTextColor(Color.parseColor("#c5f5f0"));
         fb_signoutButton.setTextColor(Color.parseColor("#c5f5f0"));
@@ -117,7 +106,14 @@ public class GooglePlusSignIn extends AppCompatActivity implements View.OnClickL
         fb_signoutButton.setOnClickListener(this);
         filemanagerbutton.setOnClickListener(this);
 
+        findViewById(R.id.filemangaerbutton).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
 
+              imageFragment.openGallery();
+            }
+
+        });
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
@@ -256,32 +252,6 @@ public class GooglePlusSignIn extends AppCompatActivity implements View.OnClickL
                 }
             }
 
-    public void openFileManager() {
-      Intent imagePicker = new Intent(Intent.ACTION_OPEN_DOCUMENT,android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);//Intent.ACTION_OPEN_DOCUMENT
-      imagePicker.addCategory(Intent.CATEGORY_OPENABLE);
-        imagePicker.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-       imagePicker.setAction(Intent.ACTION_GET_CONTENT);
-//        File file=new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)+File.separator);
-//        String imagepath=file.getPath();
-//        Uri imageUri= Uri.parse(imagepath);
-//        imagePicker.setType("image/*");
-//        startActivityForResult(Intent.createChooser(imagePicker,"Select Picture"),PICK_MULTIPLE_IMAGE);
-//
-//        InputStream  inputStream;
-//        try {
-//            Uri data=imageUri.parse(imagepath);
-//            inputStream= getContentResolver().openInputStream(imageUri);
-//            Bitmap finalimage= BitmapFactory.decodeStream(inputStream);
-//            seeImage.setImageBitmap(finalimage);
-//        }
-//        catch (FileNotFoundException ex)
-//        {
-//            ex.printStackTrace();
-//            Toast.makeText(this,"Picture not available",Toast.LENGTH_SHORT).show();
-//
-//        }
-
-    }
 
 
 
@@ -403,34 +373,35 @@ public class GooglePlusSignIn extends AppCompatActivity implements View.OnClickL
         {
             return;
         }
-            if(requestCode==PICK_MULTIPLE_IMAGE)
-            {
-                Intent FileManagerClass=new Intent(getApplicationContext(),FileManagerActivity.class);
-                startActivity(FileManagerClass);
-                //Intent imagePicker = new Intent(Intent.ACTION_OPEN_DOCUMENT,android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                //imagePicker.addCategory(Intent.CATEGORY_OPENABLE);
-                //imagePicker.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-                //imagePicker.setAction(Intent.ACTION_GET_CONTENT);
-                File file=new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)+File.separator);
-                String imagepath=file.getPath();
-                //Uri imageUri= Uri.parse(imagepath);
-               // imagePicker.setDataAndType(imageUri,"image/*");
-                try {
-                   Uri image= data.getData();
-                    InputStream inputStream= getContentResolver().openInputStream(image);
-                    Bitmap finalimage= BitmapFactory.decodeStream(inputStream);
-                    seeImage.setImageBitmap(finalimage);
-                }
-                catch (FileNotFoundException ex)
-                {
-                    ex.printStackTrace();
-                    Toast.makeText(this,"Picture not available",Toast.LENGTH_SHORT).show();
-
-                }
-
-            }
+//            if(requestCode==PICK_MULTIPLE_IMAGE)
+//            {
+//
+//                Intent FileManagerClass=new Intent(getApplicationContext(),ImageFragment.class);
+//                startActivityForResult(FileManagerClass,10);
+//                setContentView(R.layout.filemanagerlayout);
+//                LinearLayout layout=(LinearLayout)findViewById(R.id.filemanagerxmlfile);
+//                seeImage=(ImageView)layout.findViewById(R.id.seeImage);
+//                //seeImage=(ImageView) findViewById(R.id.seeImage);
+//
+//                File file=new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)+File.separator);
+//                String imagepath=file.getPath();
+//                Uri imageUri= Uri.parse(imagepath);
+//
+//                try {
+//                   Uri image= data.getData();
+//                    InputStream inputStream= getContentResolver().openInputStream(image);
+//                    Bitmap finalimage= BitmapFactory.decodeStream(inputStream);
+//                    seeImage.setImageBitmap(finalimage);
+//                }
+//                catch (FileNotFoundException ex)
+//                {
+//                    ex.printStackTrace();
+//                    Toast.makeText(this,"Picture not available",Toast.LENGTH_SHORT).show();
+//
+//                }
+//
+//            }
         }
-
 
 
     @Override
@@ -452,9 +423,7 @@ public class GooglePlusSignIn extends AppCompatActivity implements View.OnClickL
                 case R.id.fb_signoutbutton:
                     fblouout();
                     break;
-                case R.id.filemangaerbutton:
-                    openFileManager();
-                    break;
+
 
             }
 
