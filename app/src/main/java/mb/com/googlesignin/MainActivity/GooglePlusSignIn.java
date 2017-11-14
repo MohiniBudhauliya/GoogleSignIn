@@ -1,12 +1,10 @@
 package mb.com.googlesignin.MainActivity;
 
-import android.app.Activity;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.content.Context;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -46,12 +44,12 @@ import java.util.Arrays;
 import java.util.Date;
 
 import mb.com.googlesignin.DataBase.DatabaseHelper;
-import mb.com.googlesignin.filemanager.ImageFragment;
 import mb.com.googlesignin.UserRelatedClasses.LoginUserDetails;
 import mb.com.googlesignin.R;
+import mb.com.googlesignin.UserRelatedClasses.OpenGalleryActivity;
+import mb.com.googlesignin.UserRelatedClasses.CustomSlideView;
 
 import static mb.com.googlesignin.R.id.ProfilePic;
-import static mb.com.googlesignin.R.id.filemangaerbutton;
 
 public class GooglePlusSignIn extends AppCompatActivity implements View.OnClickListener,
         GoogleApiClient.OnConnectionFailedListener {
@@ -65,8 +63,6 @@ public class GooglePlusSignIn extends AppCompatActivity implements View.OnClickL
     CallbackManager callbackManager;
     DatabaseHelper dbhelper = new DatabaseHelper(this);
     LoginUserDetails userdetail = new LoginUserDetails();
-    ImageFragment imageFragment=new ImageFragment();
-
 
 
     @Override
@@ -75,6 +71,8 @@ public class GooglePlusSignIn extends AppCompatActivity implements View.OnClickL
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_google_plus_sign_in);
+
+
 
         gmailSignInButton = (Button) findViewById(R.id.gmail_signinbutton);
         gmailSignOutButton = (Button) findViewById(R.id.gmail_signoutbutton);
@@ -86,6 +84,7 @@ public class GooglePlusSignIn extends AppCompatActivity implements View.OnClickL
         fb_signinButton = (Button) findViewById(R.id.fb_signinbutton);
         fb_signoutButton = (Button) findViewById(R.id.fb_signoutbutton);
         filemanagerbutton=(Button)findViewById(R.id.filemangaerbutton);
+
         //seeImage=(ImageView)findViewById(R.id.seeImage);
 
         //Changing color of text on button
@@ -378,7 +377,7 @@ public class GooglePlusSignIn extends AppCompatActivity implements View.OnClickL
                     fblouout();
                     break;
                 case R.id.filemangaerbutton:
-                   Intent intent=new Intent(GooglePlusSignIn.this,OpenGalleryActivity.class);
+                    Intent intent=new Intent(GooglePlusSignIn.this,OpenGalleryActivity.class);
                     startActivity(intent);
                     break;
 

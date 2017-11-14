@@ -17,9 +17,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".filemanager.ImageFragment"
+        <activity android:name=".UserRelatedClasses.ImageFragment"
             android:label="@string/app_name"/>
-        <activity android:name=".MainActivity.OpenGalleryActivity"/>
+        <activity android:name=".UserRelatedClasses.OpenGalleryActivity"/>
         <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
     </application>
 
