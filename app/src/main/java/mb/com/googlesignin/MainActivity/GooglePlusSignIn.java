@@ -1,10 +1,12 @@
 package mb.com.googlesignin.MainActivity;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -24,6 +26,7 @@ import com.facebook.FacebookSdk;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.Profile;
+import com.facebook.internal.Utility;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.google.android.gms.auth.api.Auth;
@@ -44,6 +47,7 @@ import java.util.Arrays;
 import java.util.Date;
 
 import mb.com.googlesignin.DataBase.DatabaseHelper;
+import mb.com.googlesignin.UserRelatedClasses.CustomDialogFragment;
 import mb.com.googlesignin.UserRelatedClasses.LoginUserDetails;
 import mb.com.googlesignin.R;
 import mb.com.googlesignin.UserRelatedClasses.OpenGalleryActivity;
@@ -357,6 +361,7 @@ public class GooglePlusSignIn extends AppCompatActivity implements View.OnClickL
         }
     }
 
+
     @Override
     public void onClick(View v) {
         int id = v.getId();
@@ -380,6 +385,8 @@ public class GooglePlusSignIn extends AppCompatActivity implements View.OnClickL
                     Intent intent=new Intent(GooglePlusSignIn.this,OpenGalleryActivity.class);
                     startActivity(intent);
                     break;
+                }
+
 
             }
 
@@ -389,5 +396,5 @@ public class GooglePlusSignIn extends AppCompatActivity implements View.OnClickL
     }
 
 
-}
+
 

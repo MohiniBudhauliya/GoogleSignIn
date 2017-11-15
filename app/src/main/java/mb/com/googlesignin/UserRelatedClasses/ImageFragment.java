@@ -20,9 +20,6 @@ import mb.com.googlesignin.R;
 public class ImageFragment extends Fragment
 {
      public ImageView imageView;
-    CustomSlideView customSlideView;
-    ViewPager viewpager;
-
 
     @Nullable
     @Override
