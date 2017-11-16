@@ -61,7 +61,7 @@ public class GooglePlusSignIn extends AppCompatActivity implements View.OnClickL
     private static final String TAG = GooglePlusSignIn.class.getSimpleName();
     private static final int RC_SIGN_IN = 007;
     public GoogleApiClient mGoogleApiClient;
-    public Button gmailSignInButton, gmailSignOutButton, fb_signinButton, fb_signoutButton,filemanagerbutton;
+    public Button gmailSignInButton, gmailSignOutButton, fb_signinButton, fb_signoutButton, filemanagerbutton;
     public TextView loginStatus, userEmail, userName, optionText;
     public ImageView userPic;
     CallbackManager callbackManager;
@@ -77,7 +77,6 @@ public class GooglePlusSignIn extends AppCompatActivity implements View.OnClickL
         setContentView(R.layout.activity_google_plus_sign_in);
 
 
-
         gmailSignInButton = (Button) findViewById(R.id.gmail_signinbutton);
         gmailSignOutButton = (Button) findViewById(R.id.gmail_signoutbutton);
         loginStatus = (TextView) findViewById(R.id.login_status);
@@ -87,7 +86,7 @@ public class GooglePlusSignIn extends AppCompatActivity implements View.OnClickL
         optionText = (TextView) findViewById(R.id.OptionText);
         fb_signinButton = (Button) findViewById(R.id.fb_signinbutton);
         fb_signoutButton = (Button) findViewById(R.id.fb_signoutbutton);
-        filemanagerbutton=(Button)findViewById(R.id.filemangaerbutton);
+        filemanagerbutton = (Button) findViewById(R.id.filemangaerbutton);
 
         //seeImage=(ImageView)findViewById(R.id.seeImage);
 
@@ -103,7 +102,6 @@ public class GooglePlusSignIn extends AppCompatActivity implements View.OnClickL
         fb_signinButton.setOnClickListener(this);
         fb_signoutButton.setOnClickListener(this);
         filemanagerbutton.setOnClickListener(this);
-
 
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -162,19 +160,16 @@ public class GooglePlusSignIn extends AppCompatActivity implements View.OnClickL
     }
 
 
+    public void signIn() {
+        check_InternnetConnection();
+        if (connected) {
+            Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+            startActivityForResult(signInIntent, RC_SIGN_IN);
+        } else {
+            Toast.makeText(this, "Check your internet connection please", Toast.LENGTH_SHORT).show();
+        }
 
-    public void signIn(){
-            check_InternnetConnection();
-                if(connected) {
-                    Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
-                    startActivityForResult(signInIntent, RC_SIGN_IN);
-                }
-                else
-                {
-                    Toast.makeText(this,"Check your internet connection please",Toast.LENGTH_SHORT).show();
-                }
-
-                      }
+    }
 
     public void signOut() {
 
@@ -199,51 +194,51 @@ public class GooglePlusSignIn extends AppCompatActivity implements View.OnClickL
 
     public void handleSignInResult(GoogleSignInResult result) {
 
-            Log.d(TAG, "handleSignInResult:" + result.isSuccess());
-            if (result.isSuccess()) {
-                // Signed in successfully, show authenticated UI.
+        Log.d(TAG, "handleSignInResult:" + result.isSuccess());
+        if (result.isSuccess()) {
+            // Signed in successfully, show authenticated UI.
 
-                GoogleSignInAccount acct = result.getSignInAccount();
-                Log.e(TAG, "display name: " + acct.getDisplayName());
+            GoogleSignInAccount acct = result.getSignInAccount();
+            Log.e(TAG, "display name: " + acct.getDisplayName());
 
-                userdetail.setName(acct.getDisplayName());
-                userdetail.setEmail(acct.getEmail());
-                userdetail.setAppname("Google");
-                userdetail.setLogintime(DateFormat.getDateTimeInstance().format(new Date()));
+            userdetail.setName(acct.getDisplayName());
+            userdetail.setEmail(acct.getEmail());
+            userdetail.setAppname("Google");
+            userdetail.setLogintime(DateFormat.getDateTimeInstance().format(new Date()));
 
-                String personName = acct.getDisplayName();
-                String email = acct.getEmail();
+            String personName = acct.getDisplayName();
+            String email = acct.getEmail();
 
-                userName.setText(personName);
-                userEmail.setText(email);
+            userName.setText(personName);
+            userEmail.setText(email);
 
-                String Pic = "";
-                if (acct.getPhotoUrl() == null) {
-                    userPic.setImageResource(R.drawable.defaultpic);
-                } else {
-                    Pic = acct.getPhotoUrl().toString();
-                    Glide.with(getApplicationContext()).load(Pic)
-                            .thumbnail(0.5f)
-                            .crossFade()
-                            .diskCacheStrategy(DiskCacheStrategy.ALL)
-                            .into(userPic);
-                    Toast.makeText(this, "You have successfully logged in", Toast.LENGTH_SHORT).show();
-                }
-                dbhelper.insertRecord(userdetail);
-
-                updateUI(true);
-
-
-                Log.e(TAG, "Name: " + personName + ", email: " + email
-                        + ", Image: " + Pic);
-
+            String Pic = "";
+            if (acct.getPhotoUrl() == null) {
+                userPic.setImageResource(R.drawable.defaultpic);
+            } else {
+                Pic = acct.getPhotoUrl().toString();
+                Glide.with(getApplicationContext()).load(Pic)
+                        .thumbnail(0.5f)
+                        .crossFade()
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .into(userPic);
+                Toast.makeText(this, "You have successfully logged in", Toast.LENGTH_SHORT).show();
             }
-            else{
-                    // Signed out, show unauthenticated UI.
-                    updateUI(false);
-                }
-            }
-    public  void updateUI(boolean isSignedIn) {
+            dbhelper.insertRecord(userdetail);
+
+            updateUI(true);
+
+
+            Log.e(TAG, "Name: " + personName + ", email: " + email
+                    + ", Image: " + Pic);
+
+        } else {
+            // Signed out, show unauthenticated UI.
+            updateUI(false);
+        }
+    }
+
+    public void updateUI(boolean isSignedIn) {
 
         if (isSignedIn) {
             gmailSignInButton.setVisibility(View.GONE);
@@ -256,8 +251,7 @@ public class GooglePlusSignIn extends AppCompatActivity implements View.OnClickL
             optionText.setVisibility(View.GONE);
             filemanagerbutton.setVisibility(View.VISIBLE);
 
-        }
-        else {
+        } else {
             gmailSignOutButton.setVisibility(View.GONE);
             gmailSignInButton.setVisibility(View.VISIBLE);
             loginStatus.setVisibility(View.VISIBLE);
@@ -317,9 +311,7 @@ public class GooglePlusSignIn extends AppCompatActivity implements View.OnClickL
 
                             }
                             dbhelper.insertRecord(userdetail);
-                        }
-                        catch (JSONException e)
-                        {
+                        } catch (JSONException e) {
                             e.printStackTrace();
                         }
                     }
@@ -366,34 +358,32 @@ public class GooglePlusSignIn extends AppCompatActivity implements View.OnClickL
     public void onClick(View v) {
         int id = v.getId();
 
-            switch (id) {
+        switch (id) {
 
-                case R.id.gmail_signinbutton:
-                    signIn();
-                    break;
-                case R.id.gmail_signoutbutton:
-                    signOut();
-                    break;
-                case R.id.fb_signinbutton:
-                    LoginManager.getInstance().logInWithReadPermissions(GooglePlusSignIn.this
-                            , Arrays.asList("public_profile", "user_friends", "email"));
-                    break;
-                case R.id.fb_signoutbutton:
-                    fblouout();
-                    break;
-                case R.id.filemangaerbutton:
-                    Intent intent=new Intent(GooglePlusSignIn.this,OpenGalleryActivity.class);
-                    startActivity(intent);
-                    break;
-                }
-
-
-            }
-
-
+            case R.id.gmail_signinbutton:
+                signIn();
+                break;
+            case R.id.gmail_signoutbutton:
+                signOut();
+                break;
+            case R.id.fb_signinbutton:
+                LoginManager.getInstance().logInWithReadPermissions(GooglePlusSignIn.this
+                        , Arrays.asList("public_profile", "user_friends", "email"));
+                break;
+            case R.id.fb_signoutbutton:
+                fblouout();
+                break;
+            case R.id.filemangaerbutton:
+                Intent intent = new Intent(GooglePlusSignIn.this, OpenGalleryActivity.class);
+                startActivity(intent);
+                break;
+        }
 
 
     }
+
+
+}
 
 
 

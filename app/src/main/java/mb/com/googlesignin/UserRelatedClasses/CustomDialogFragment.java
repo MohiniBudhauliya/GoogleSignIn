@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DialogFragment;
+import android.app.FragmentManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -11,6 +12,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 
@@ -23,6 +25,8 @@ import mb.com.googlesignin.MainActivity.GooglePlusSignIn;
  */
 
 public class CustomDialogFragment extends DialogFragment {
+    OpenGalleryActivity openGalleryobj=new OpenGalleryActivity();
+    String userChoosenTask="";
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,34 +72,42 @@ public class CustomDialogFragment extends DialogFragment {
                 return true;
             }
         }
-    OpenGalleryActivity obj=new OpenGalleryActivity();
-    String userChoosenTask="";
-
+    @RequiresApi(api = Build.VERSION_CODES.M)
     public void selectImage() {
-        final CharSequence[] items = { "Take Photo", "Choose from Library",
-                "Cancel" };
-        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(getActivity().getBaseContext());
-        builder.setTitle("Add Photo!");
-        builder.setItems(items, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int item) {
-                boolean result= checkPermission(getActivity().getBaseContext());
-                if (items[item].equals("Take Photo")) {
-                    userChoosenTask="Take Photo";
-                    if(result)
-                        cameraIntent();
-                } else if (items[item].equals("Choose from Library")) {
-                    userChoosenTask="Choose from Library";
-                    if(result) {
-                        cameraIntent();
-                        //obj.openGallery();
-                    }
-                } else if (items[item].equals("Cancel")) {
-                    dialog.dismiss();
-                }
-            }
-        });
-        builder.show();
-    }
+//
+//        final CharSequence[] items = { "Take Photo", "Choose from Library",
+//                "Cancel" };
+//
+//
+//
+//        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(OpenGalleryActivity.class);
+//        builder.setTitle("Add Photo!");
+//        builder.setItems(items, new DialogInterface.OnClickListener() {
+//            @Override
+//            public void onClick(DialogInterface dialog, int item) {
+//                boolean result= checkPermission(getActivity().getBaseContext());
+//                if (items[item].equals("Take Photo"))
+//                {
+//                    userChoosenTask="Take Photo";
+//                    if(result) {
+//                        cameraIntent();
+//                    }
+//                }
+//                else if (items[item].equals("Choose from Library"))
+//                {
+//                    userChoosenTask="Choose from Library";
+//                    if(result)
+//                    {
+//                        openGalleryobj.openGallery();
+//                    }
+//                }
+//                else if (items[item].equals("Cancel"))
+//                {
+//                    dialog.dismiss();
+//                }
+//            }
+//        });
+//        builder.show();
+  }
     }
 

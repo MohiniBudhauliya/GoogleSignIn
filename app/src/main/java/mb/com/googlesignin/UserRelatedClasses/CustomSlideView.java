@@ -52,7 +52,6 @@ public class CustomSlideView extends PagerAdapter {
     public Object instantiateItem(ViewGroup container, int position) {
         inflater=(LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View image_item=inflater.inflate(R.layout.imagefragmentxml,container,false);
-        ImageView imageView = (ImageView) image_item.findViewById(R.id.seeImage);
         Glide.with(getApplicationContext()).load(images.get(position).toString())
                 .thumbnail(0.5f)
                 .crossFade()
